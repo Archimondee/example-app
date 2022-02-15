@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostsController;
 use Illuminate\Support\Facades\DB;
 use App\Post;
+use App\User;
+use App\Country;
 
 /*
 |--------------------------------------------------------------------------
@@ -125,9 +127,72 @@ Route::get('/readsoftdelete', function () {
     $post = Post::onlyTrashed()->where('id', 6)->get();
     return $post;
 });
-Route::get('/restore', function(){
+Route::get('/restore', function () {
     Post::withTrashed()->where('is_admin', 0)->restore();
 });
-Route::get('/forcedelete', function(){
+Route::get('/forcedelete', function () {
     Post::withTrashed()->where('id', 6)->forceDelete();
+});
+
+//Eloquent Relationship
+Route::get('/user/{id}/post', function ($id) {
+    //One to one
+    $user = User::find($id)->post->content;
+    return $user;
+});
+Route::get('/post/{id}/user', function ($id) {
+    //Inverse
+    return Post::find($id)->user->name;
+});
+Route::get('/posts', function () {
+    //One to many
+    $user = User::find(1);
+
+    foreach ($user->posts as $post) {
+        echo $post->title . "<br>";
+    }
+});
+
+//Many to many relationship
+Route::get('user/{id}/role', function ($id) {
+    $user = User::find($id)->roles()->orderBy('id', 'desc')->get();
+    //return $user;
+    foreach ($user as $role) {
+        return $role->name;
+    }
+});
+
+//Accessing the intermediate table / pivot
+Route::get('user/pivot/{id}', function ($id) {
+    $user = User::find($id);
+
+    foreach ($user->roles as $role) {
+        echo $role->pivot;
+    }
+});
+
+Route::get('/user/{id}/country', function ($id) {
+    $country = Country::find(2);
+    //echo $country;
+    foreach ($country->posts as $post) {
+        return $post->title;
+    }
+});
+
+//Polymorphic relations
+
+Route::get('/user/{id}/photos', function ($id) {
+    $user = User::find($id);
+
+    foreach ($user->photos as $photo) {
+        return $photo->path;
+    }
+});
+
+Route::get('/post/{id}/photos', function ($id) {
+    $post = Post::find($id);
+
+    foreach ($post->photos as $photo) {
+        echo $photo->path . '<br/>';
+    }
 });

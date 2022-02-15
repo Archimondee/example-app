@@ -16,4 +16,12 @@ class Post extends Model
     protected $dates = ['deleted_at'];
 
     protected $fillable = ['title', 'content'];
+
+    public function user(){
+        //inverse (terbalik one to one)
+        return $this->belongsTo('App\User');
+    }
+    public function photos(){
+        return $this->morphMany('App\Photo', 'imageable');
+    }
 }
