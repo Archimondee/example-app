@@ -56,9 +56,10 @@ class User extends Authenticatable
         //To customize tables and columns follow the format
         //return $this->belongsToMany('App\Role', 'role_user', 'user_id', 'role_id');
 
-        return $this->belongsToMany('App\Role')-> withPivot('created_at');
+        return $this->belongsToMany('App\Role')->withPivot('created_at');
     }
-    public function photos(){
+    public function photos()
+    {
         return $this->morphMany('App\Photo', 'imageable');
     }
 }
